@@ -1,29 +1,38 @@
+from pip import main
 import requests
 import json
+import requests
 
-with open('credencials.json') as f:
-    credentials = json.load(f)
+def get_post_id_from_tag(hashtag_id:str, serch_type:str, credentials:dict):
+    INSTAGRAM_ID = credentials["instagram_id"]
+    ACCESS_TOKEN = credentials["access_token"]
 
+    fields = [
+        "id",
+        "permalink",
+        "timestamp",
+    ]
+    fields_str = ",".join(fields)
+    limit = 100
+    url = f"https://graph.facebook.com/{hashtag_id}/{serch_type}?user_id={INSTAGRAM_ID}&access_token={ACCESS_TOKEN}&fields={fields_str}&limit={limit}"
+    response = requests.get(url)
+    json_data = response.json()
 
-INSTAGRAM_ID = credentials['instagram_id']
-ACCESS_TOKEN = credentials['access_token']
+    posts = []
+    for post_data in json_data["data"]:
+        post = {
+            "post_id": post_data["permalink"].rstrip("/").split("/")[-1],
+            "timestamp": post_data["timestamp"],
+        }
+        posts.append(post)
+    return posts
 
-# 検索したいワード
-query = "新宿ランチ"
+if __name__ == "__main__":
+    with open("credencials.json") as f:
+        credentials = json.load(f)
 
-id_search_url = f"https://graph.facebook.com/ig_hashtag_search?user_id={INSTAGRAM_ID}&q={query}&access_token={ACCESS_TOKEN}"
-
-response = requests.get(id_search_url)
-hash_id = response.json()["data"][0]['id']
-print(hash_id)
-
-serch_type = "top_media"
-
-url = (
-    f"https://graph.facebook.com/{hash_id}/{serch_type}?user_id={INSTAGRAM_ID}&q={query}&access_token={ACCESS_TOKEN}&fields="
-    + "id,media_type,media_url,permalink,like_count,comments_count,caption,timestamp,children{id,media_url}&limit=50"
-)
-
-response = requests.get(url)
-json_data = response.json()
-print(json_data)
+    hashtag_id = "17841562042082021" # 新宿ランチ
+    serch_type = "top_media" # top_media or recent_media
+    
+    posts = get_post_id_from_tag(hashtag_id, serch_type, credentials)
+    print(posts)
