@@ -14,8 +14,8 @@ def url2Location(cl, permalink):
             "locationId": media_info["location"]["external_id"],
             "name": media_info["location"]["name"],
         }
-    except KeyError as e:
-        print(f"error: lat, lng, external_id, name is not in location: {e}")
+    except Exception as e:
+        print(f"info: {permalink} is no location tag:( ({e})")
         return None
     for _, value in location.items():
         if value == None or value == "":

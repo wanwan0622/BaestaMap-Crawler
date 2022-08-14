@@ -11,14 +11,14 @@ def getOldTags(fs, max:int):
  
 def uploadPosts(fs, cl, posts:list, tag_docs_id: str):
     for post in posts:
-        doc_ref = fs.db.collection('posts').document()
-        try:
-            permalink = post["permalink"]
-        except KeyError as e:
+        if "permalink" not in post or post["permalink"] == "":
             print(f"error: permalink is not found: {e}")
+        permalink = post["permalink"]
+        
+        location = url2Location(cl, permalink)
         try:
-            location = url2Location(cl, permalink)
-            if location == None:
+            doc_ref = fs.db.collection('posts').document(permalink)
+            if location is None:
                 continue
             doc_ref.set(
                 {
