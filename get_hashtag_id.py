@@ -1,4 +1,5 @@
 import requests
+import datetime
 
 # Get hashtag id from hashtag word
 def get_hashtag_id(query, credentials):
@@ -23,7 +24,7 @@ def addHashTagId(fs, credentials):
             {
                 "hashTag": query,
                 "hashTagId": hashtag_id,
-                "lastUpdate": None
+                "timestamp": datetime.datetime.now(tz=datetime.timezone.utc)
             }
         )
         tag_no_id_ref = fs.db.collection('hashTagNoId').document(hashTag.id)
