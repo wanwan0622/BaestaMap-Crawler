@@ -7,6 +7,8 @@ name = "pypi"
 google-cloud-firestore = "*"
 firebase-admin = "*"
 certifi = "*"
+instagrapi = "*"
+pillow = "*"
 
 [dev-packages]
 
