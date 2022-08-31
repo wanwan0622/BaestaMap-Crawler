@@ -12,6 +12,7 @@ def get_hashtag_id(query, credentials):
     return hashtag_id # str
 
 # add Hashtag Id on Firestore
+# 事前にhashTagNoIdコレクションに{"hashTag":"新宿ランチ"}のようなデータを入れておく
 def addHashTagId(fs, credentials):
     hashTags = fs.db.collection("hashTagNoId").stream()
     for hashTag in hashTags:
