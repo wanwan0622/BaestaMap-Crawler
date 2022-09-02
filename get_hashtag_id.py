@@ -8,25 +8,33 @@ def get_hashtag_id(query, credentials):
 
     id_search_url = f"https://graph.facebook.com/ig_hashtag_search?user_id={INSTAGRAM_ID}&q={query}&access_token={ACCESS_TOKEN}"
     response = requests.get(id_search_url)
-    hashtag_id = response.json()["data"][0]["id"]
-    return hashtag_id # str
+    try:
+        hashtag_id = response.json()["data"][0]["id"]
+        return str(hashtag_id)
+    except:
+        return None
 
 # add Hashtag Id on Firestore
-# 事前にhashTagNoIdコレクションに{"hashTag":"新宿ランチ"}のようなデータを入れておく
 def addHashTagId(fs, credentials):
     hashTags = fs.db.collection("hashTagNoId").stream()
-    for hashTag in hashTags:
-        query = hashTag.get('hashTag')
+    for idx, hashTag in enumerate(hashTags):
+        print(
+            f"({idx+1}) Setting hashtag: {hashTag.to_dict()}"
+        )
         if not hashTag.exists:
             continue
+        query = hashTag.get("hashTag")
+        if query[0] == "－":
+            continue
         hashtag_id = get_hashtag_id(query, credentials)
-        doc_ref = fs.db.collection('hashTag').document()
-        doc_ref.set(
-            {
-                "hashTag": query,
-                "hashTagId": hashtag_id,
-                "timestamp": datetime.datetime.now(tz=datetime.timezone.utc)
-            }
-        )
-        tag_no_id_ref = fs.db.collection('hashTagNoId').document(hashTag.id)
+        if hashtag_id is not None:
+            doc_ref = fs.db.collection("hashTag").document()
+            doc_ref.set(
+                {
+                    "hashTag": query,
+                    "hashTagId": hashtag_id,
+                    "timestamp": datetime.datetime.now(tz=datetime.timezone.utc),
+                }
+            )
+        tag_no_id_ref = fs.db.collection("hashTagNoId").document(hashTag.id)
         tag_no_id_ref.delete()
