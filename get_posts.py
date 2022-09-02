@@ -31,7 +31,11 @@ def uploadPosts(fs, cl, posts:list, tag_docs_id: str):
         except Exception as e:
             print(f"error: {e}")
             continue
-    
+
+def deleteHashTag(fs, tag_docs_id: str):
+    tag_ref = fs.db.collection("hashTag").document(tag_docs_id)
+    tag_ref.delete()
+
 # serch_type: top_media or recent_media
 def getPosts(fs, cl, credentials:dict,serch_type:str = "recent_media"):
     old_tags = getOldTags(fs=fs, max=10)
@@ -78,4 +82,7 @@ def getPosts(fs, cl, credentials:dict,serch_type:str = "recent_media"):
             print(f"error: {e}")
             continue
         uploadPosts(fs=fs, cl=cl, posts=posts, tag_docs_id=tag_docs_id)
+        if len(posts) == 0:
+            print(f"info: delete HashTag Docs {tag_docs_id}: {hashtag.get('hashTag')}")
+            deleteHashTag(fs=fs, tag_docs_id=tag_docs_id)
     return posts
