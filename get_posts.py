@@ -43,8 +43,8 @@ def deleteHashTag(fs, tag_docs_id: str):
 
 
 # serch_type: top_media or recent_media
-def getPosts(fs, cl, credentials: dict, serch_type: str = "recent_media"):
-    old_tags = getOldTags(fs=fs, max=10)
+def getPostsFromAPI(fs, cl, credentials: dict, serch_type: str = "recent_media"):
+    old_tags = getOldTags(fs=fs, max=50)
     INSTAGRAM_ID = credentials["instagram_id"]
     ACCESS_TOKEN = credentials["access_token"]
 
@@ -97,8 +97,8 @@ def getPosts(fs, cl, credentials: dict, serch_type: str = "recent_media"):
 
 
 # serch_type: top_media or recent_media
-def getPosts2(fs, cl):
-    old_tags = getOldTags(fs=fs, max=10)
+def getPostsFromLibrary(fs, cl):
+    old_tags = getOldTags(fs=fs, max=50)
 
     for hashtag in old_tags:
         print("info: collect posts from hashtag:", hashtag.get("hashTag"))
@@ -110,7 +110,8 @@ def getPosts2(fs, cl):
         hashtag_id = hashtag["hashTagId"]
         print(hashtag_id)
 
-        res = cl.hashtag_medias_top(hashtag["hashTag"])
+        # TODO: いずれrecentにする
+        res = cl.hashtag_medias_top(hashtag["hashTag"], amount=100)
         posts = []
         try:
             for post_data in res:
